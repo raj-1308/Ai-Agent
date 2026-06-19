@@ -41,7 +41,6 @@ export function MessageBubble({ role, content }: MessageBubbleProps) {
                   }
                   return (
                     <SyntaxHighlighter
-                      // @ts-expect-error - style type mismatch between prism style packs is benign
                       style={oneDark}
                       language={match?.[1]}
                       PreTag="div"
