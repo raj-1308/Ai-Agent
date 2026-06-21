@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost';
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -11,7 +11,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const styles =
       variant === 'primary'
         ? 'bg-electric text-white hover:bg-electric-soft shadow-[0_0_0_1px_rgba(59,130,246,0.4)] hover:shadow-[0_0_20px_rgba(59,130,246,0.35)]'
-        : 'bg-white/5 text-white hover:bg-white/10 border border-white/10';
+        : variant === 'secondary'
+        ? 'bg-white/10 text-white/80 hover:bg-white/15 border border-white/10'
+        : 'bg-transparent text-white/80 hover:text-white';
 
     return (
       <button ref={ref} className={`${base} ${styles} ${className}`} {...props}>

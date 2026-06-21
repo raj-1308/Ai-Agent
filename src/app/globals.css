@@ -4,23 +4,89 @@
 
 :root {
   --midnight: #06060a;
-  --electric: #3b82f6;
+  --midnight-soft: #0d0d14;
+  --highlight: #3b82f6;
+  --highlight-soft: #60a5fa;
+  --glass-surface: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --text-primary: #f4f4fb;
+  --text-secondary: #b8b8d2;
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  background: var(--midnight);
-  color: #e8e8ee;
+html {
+  scroll-behavior: smooth;
 }
 
-/* Subtle glassmorphism utility used across cards/panels */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text-primary);
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 20%),
+    radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.12), transparent 18%),
+    linear-gradient(180deg, #04050a 0%, #08090f 54%, #06060a 100%);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
 .glass {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+}
+
+.glass-soft {
+  background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(24px);
+}
+
+.premium-card {
+  background: rgba(15, 15, 28, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 90px rgba(59, 130, 246, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.status-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+}
+
+@keyframes pulse-dots {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.dot-pulse > span {
+  display: inline-flex;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.8);
+  animation: pulse-dots 1.2s infinite ease-in-out;
+}
+
+.dot-pulse > span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot-pulse > span:nth-child(3) {
+  animation-delay: 0.4s;
 }
 
 .logo-shell {
@@ -95,11 +161,11 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;

@@ -12,11 +12,12 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ role, content }: MessageBubbleProps) {
   const isUser = role === 'user';
+  const isTypingIndicator = !content.trim() && role === 'assistant';
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[75ch] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+        className={`max-w-[75ch] rounded-3xl px-5 py-4 text-sm leading-relaxed shadow-[0_20px_60px_rgba(0,0,0,0.14)] ${
           isUser
             ? 'bg-electric text-white'
             : 'glass text-white/90'
@@ -24,6 +25,12 @@ export function MessageBubble({ role, content }: MessageBubbleProps) {
       >
         {isUser ? (
           <p className="whitespace-pre-wrap">{content}</p>
+        ) : isTypingIndicator ? (
+          <div className="dot-pulse flex items-center gap-2">
+            <span />
+            <span />
+            <span />
+          </div>
         ) : (
           <div className="prose-amior">
             <ReactMarkdown

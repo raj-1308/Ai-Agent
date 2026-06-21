@@ -43,3 +43,21 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ conversation: rows[0] }, { status: 201 });
 }
+
+export async function DELETE() {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+
+  await pool.query(
+    `DELETE FROM messages WHERE conversation_id IN (
+       SELECT id FROM conversations WHERE user_id = $1
+     )`,
+    [user.userId]
+  );
+
+  await pool.query('DELETE FROM conversations WHERE user_id = $1', [user.userId]);
+
+  return NextResponse.json({ ok: true });
+}

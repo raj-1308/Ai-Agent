@@ -1,19 +1,54 @@
-'use client';
+﻿'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Logo } from '@/components/Logo';
+import { Button } from '@/components/Button';
 
-const SUGGESTIONS = [
-  'Explain a complex topic simply',
-  'Help me debug a piece of code',
-  'Draft an email to a client',
-  'Brainstorm names for a project',
+const QUICK_PROMPTS = [
+  'Build Website',
+  'Create AI Agent',
+  'Generate Marketing Plan',
+  'Analyze Business',
+  'Code Assistant',
+  'Research Topic',
 ];
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function displayName(email: string) {
+  return email
+    .split('@')[0]
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+    .join(' ');
+}
 
 export default function ChatIndexPage() {
   const router = useRouter();
+  const [userName, setUserName] = useState('there');
   const [creating, setCreating] = useState(false);
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.user?.email) {
+          setUserName(displayName(data.user.email));
+        }
+      } catch {
+        // ignore
+      }
+    }
+    void loadUser();
+  }, []);
 
   async function startConversation(initialMessage?: string) {
     setCreating(true);
@@ -30,38 +65,39 @@ export default function ChatIndexPage() {
   }
 
   return (
-    <main className="flex-1 flex items-center justify-center px-6">
-      <div className="max-w-xl w-full text-center">
-        <div className="mx-auto mb-10 w-fit rounded-[2rem] bg-white/5 p-6 shadow-[0_32px_90px_rgba(59,130,246,0.18)] ring-1 ring-white/10 backdrop-blur-xl">
-          <Logo className="h-24 w-24 mx-auto animate-logo-entry" />
-          <h1 className="mt-6 text-4xl font-semibold tracking-tight">
-            One Intelligence. Unlimited Possibilities.
+    <main className="flex min-h-[calc(100vh-72px)] flex-col overflow-y-auto bg-midnight px-4 py-10 sm:px-6 lg:px-12">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-8">
+        <section className="w-full rounded-[2rem] border border-white/10 bg-white/5 px-6 py-10 shadow-glass-lg backdrop-blur-xl sm:px-8 lg:px-10">
+          <p className="text-sm uppercase tracking-[0.32em] text-electric-soft">Welcome back</p>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+            {getGreeting()} {userName} 👋
           </h1>
-          <p className="text-white/50 mt-3 max-w-xl mx-auto">
-            Launch Amior instantly with smart prompts and a premium AI interface built for powerful conversations.
+          <p className="mt-4 max-w-3xl text-lg leading-8 text-white/65 sm:text-xl">
+            Your premium AI workspace is ready. Choose one of the top prompts to begin a clean, effective session.
           </p>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {SUGGESTIONS.map((s) => (
-            <button
-              key={s}
-              disabled={creating}
-              onClick={() => startConversation(s)}
-              className="glass rounded-xl px-4 py-3 text-sm text-left text-white/80 hover:text-white hover:bg-white/[0.07] transition-colors disabled:opacity-50"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {QUICK_PROMPTS.map((prompt) => (
+              <button
+                key={prompt}
+                onClick={() => startConversation(prompt)}
+                disabled={creating}
+                className="min-h-[110px] rounded-[1.75rem] border border-white/10 bg-midnight-soft px-5 py-5 text-left text-white/85 transition hover:border-electric/30 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <p className="text-base font-semibold">{prompt}</p>
+              </button>
+            ))}
+          </div>
 
-        <button
-          disabled={creating}
-          onClick={() => startConversation()}
-          className="mt-6 text-sm text-electric-soft hover:underline disabled:opacity-50"
-        >
-          Or start a blank conversation →
-        </button>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:justify-start">
+            <Button onClick={() => startConversation('Build Website')} disabled={creating}>
+              Start with Build Website
+            </Button>
+            <Button variant="secondary" onClick={() => startConversation('Create AI Agent')} disabled={creating}>
+              Create AI Agent
+            </Button>
+          </div>
+        </section>
       </div>
     </main>
   );
