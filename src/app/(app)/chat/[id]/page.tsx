@@ -10,6 +10,8 @@ interface Message {
   content: string;
 }
 
+const EMPTY_PROMPTS = ['Draft a launch plan', 'Write a polished email', 'Plan a product strategy'];
+
 export default function ConversationPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -29,7 +31,6 @@ export default function ConversationPage() {
   const recognitionRef = useRef<any>(null);
   const speechBaseRef = useRef('');
 
-  // Load conversation history on mount / when switching conversations.
   useEffect(() => {
     let cancelled = false;
 
@@ -50,8 +51,6 @@ export default function ConversationPage() {
       }
       setLoadingHistory(false);
 
-      // If we arrived here from the empty-state page with a pending
-      // suggestion, send it automatically once history has loaded.
       const pendingKey = `amior_pending_message_${conversationId}`;
       const pending = sessionStorage.getItem(pendingKey);
       if (pending) {
@@ -167,9 +166,7 @@ export default function ConversationPage() {
             }
             if (typeof parsed.delta === 'string') {
               setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId ? { ...m, content: m.content + parsed.delta } : m
-                )
+                prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + parsed.delta } : m))
               );
             }
           } catch {
@@ -181,7 +178,7 @@ export default function ConversationPage() {
       setErrorMsg('Connection lost. Please try again.');
     } finally {
       setStreaming(false);
-      router.refresh(); // keeps sidebar conversation title/order in sync
+      router.refresh();
     }
   }
 
@@ -217,7 +214,7 @@ export default function ConversationPage() {
 
   if (notFound) {
     return (
-      <main className="flex-1 flex items-center justify-center">
+      <main className="flex flex-1 items-center justify-center">
         <p className="text-white/50">This conversation doesn&apos;t exist or was deleted.</p>
       </main>
     );
@@ -226,28 +223,40 @@ export default function ConversationPage() {
   const isEmptyConversation = !loadingHistory && messages.length === 0;
 
   return (
-    <main className="flex-1 flex flex-col min-h-0">
+    <main className="flex min-h-0 flex-1 flex-col">
       {isEmptyConversation ? (
-        <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-8 py-10">
-          <div className="w-full max-w-3xl rounded-[2rem] bg-midnight-soft border border-white/10 p-10 text-center shadow-glass-lg">
-            <p className="text-sm uppercase tracking-[0.32em] text-electric-soft">Start your first message</p>
-            <h2 className="mt-6 text-3xl font-semibold tracking-tight text-white">What is the agenda?</h2>
+        <div className="flex flex-1 flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-10">
+          <div className="w-full max-w-3xl rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] p-8 text-center shadow-[0_35px_120px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-10">
+            <div className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full border border-electric/30 bg-electric/10 text-electric-soft">
+              ✦
+            </div>
+            <p className="mt-6 text-sm uppercase tracking-[0.32em] text-electric-soft">Start your first message</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">What would you like to create today?</h2>
             <p className="mt-4 text-base leading-7 text-white/60">
-              What&apos;s on your mind? Share your goal, task, or project and Amior will help you begin with clarity.
+              Share a goal, a draft, or a problem and Amior will help you move from idea to polished output.
             </p>
-            <p className="mt-2 text-sm text-white/40">
-              Ask anything: write a brief, build a website, create a plan, or analyze your business.
-            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {EMPTY_PROMPTS.map((prompt) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  onClick={() => setInput(prompt)}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70 transition hover:border-electric/30 hover:bg-white/10 hover:text-white"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-10 w-full max-w-3xl">
-            {errorMsg && <p className="text-sm text-red-400 mb-4 text-center">{errorMsg}</p>}
-            <form onSubmit={handleSubmit} className="glass rounded-[2rem] border border-white/10 p-4 shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="mt-8 w-full max-w-3xl">
+            {errorMsg && <p className="mb-4 text-center text-sm text-red-400">{errorMsg}</p>}
+            <form onSubmit={handleSubmit} className="rounded-[2rem] border border-white/10 bg-midnight-soft/90 p-3 shadow-[0_30px_90px_rgba(0,0,0,0.3)] sm:p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <button
                   type="button"
                   onClick={handleMicToggle}
-                  className={`inline-flex h-14 w-14 flex-none items-center justify-center rounded-[1.5rem] border border-white/10 bg-white/5 text-white transition hover:bg-white/10 ${
+                  className={`inline-flex h-14 w-14 flex-none items-center justify-center rounded-[1.35rem] border border-white/10 bg-white/5 text-white transition hover:bg-white/10 ${
                     listening ? 'ring-2 ring-electric-soft/60 shadow-[0_0_0_6px_rgba(59,130,246,0.12)]' : ''
                   }`}
                   aria-label={listening ? 'Stop voice input' : 'Start voice input'}
@@ -276,12 +285,12 @@ export default function ConversationPage() {
                   placeholder={listening ? 'Listening… speak now' : 'What do you want to do today?'}
                   rows={3}
                   disabled={streaming}
-                  className="min-h-[120px] w-full resize-none rounded-[1.5rem] border border-white/10 bg-black/10 px-4 py-4 text-sm text-white outline-none placeholder:text-white/40 focus:border-electric/40 focus:ring-2 focus:ring-electric/10"
+                  className="min-h-[120px] w-full resize-none rounded-[1.35rem] border border-white/10 bg-black/10 px-4 py-4 text-sm text-white outline-none placeholder:text-white/40 focus:border-electric/40 focus:ring-2 focus:ring-electric/10"
                 />
                 <button
                   type="submit"
                   disabled={streaming || !input.trim()}
-                  className="h-14 min-w-[140px] rounded-[1.5rem] bg-electric text-sm font-semibold text-white transition hover:bg-electric-soft disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-14 min-w-[140px] rounded-[1.35rem] bg-electric text-sm font-semibold text-white transition hover:bg-electric-soft disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {streaming ? 'Sending…' : 'Send'}
                 </button>
@@ -291,8 +300,8 @@ export default function ConversationPage() {
         </div>
       ) : (
         <>
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-4">
-            {loadingHistory && <p className="text-center text-white/30 text-sm">Loading…</p>}
+          <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-6 sm:px-8">
+            {loadingHistory && <p className="text-center text-sm text-white/30">Loading…</p>}
 
             {!loadingHistory &&
               messages.map((m) => (
@@ -300,12 +309,9 @@ export default function ConversationPage() {
               ))}
           </div>
 
-          <div className="px-4 sm:px-8 pb-6 pt-2">
-            {errorMsg && <p className="text-sm text-red-400 mb-2">{errorMsg}</p>}
-            <form
-              onSubmit={handleSubmit}
-              className="glass rounded-2xl p-2 flex items-end gap-2"
-            >
+          <div className="px-4 pb-6 pt-2 sm:px-8">
+            {errorMsg && <p className="mb-2 text-sm text-red-400">{errorMsg}</p>}
+            <form onSubmit={handleSubmit} className="flex items-end gap-2 rounded-[1.5rem] border border-white/10 bg-midnight-soft/90 p-2 shadow-[0_20px_70px_rgba(0,0,0,0.24)]">
               <button
                 type="button"
                 onClick={handleMicToggle}
@@ -339,12 +345,12 @@ export default function ConversationPage() {
                 placeholder={listening ? 'Listening… speak now' : 'Message Amior…'}
                 rows={1}
                 disabled={streaming}
-                className="flex-1 resize-none bg-transparent outline-none text-sm px-3 py-2 max-h-40 placeholder:text-white/30"
+                className="max-h-40 flex-1 resize-none bg-transparent px-3 py-2 text-sm text-white outline-none placeholder:text-white/30"
               />
               <button
                 type="submit"
                 disabled={streaming || !input.trim()}
-                className="rounded-xl bg-electric hover:bg-electric-soft disabled:opacity-40 disabled:hover:bg-electric text-white px-4 py-2 text-sm font-medium transition-colors"
+                className="rounded-xl bg-electric px-4 py-2 text-sm font-medium text-white transition hover:bg-electric-soft disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {streaming ? '…' : 'Send'}
               </button>

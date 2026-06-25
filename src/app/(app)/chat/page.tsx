@@ -65,16 +65,21 @@ export default function ChatIndexPage() {
   }
 
   return (
-    <main className="flex min-h-[calc(100vh-72px)] flex-col overflow-y-auto bg-midnight px-4 py-10 sm:px-6 lg:px-12">
-      <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-8">
-        <section className="w-full rounded-[2rem] border border-white/10 bg-white/5 px-6 py-10 shadow-glass-lg backdrop-blur-xl sm:px-8 lg:px-10">
-          <p className="text-sm uppercase tracking-[0.32em] text-electric-soft">Welcome back</p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-            {getGreeting()} {userName} 👋
-          </h1>
-          <p className="mt-4 max-w-3xl text-lg leading-8 text-white/65 sm:text-xl">
-            Your premium AI workspace is ready. Choose one of the top prompts to begin a clean, effective session.
-          </p>
+    <main className="flex min-h-[calc(100vh-72px)] flex-col overflow-y-auto bg-midnight px-4 py-8 sm:px-6 lg:px-10">
+      <div className="mx-auto flex w-full max-w-5xl flex-1 items-center justify-center">
+        <section className="w-full rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-6 py-8 shadow-[0_30px_120px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+            <div className="inline-flex items-center gap-2 rounded-full border border-electric/20 bg-electric/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.32em] text-electric-soft">
+              <span className="h-2 w-2 rounded-full bg-electric-soft" />
+              Welcome back
+            </div>
+            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              {getGreeting()} {userName} 👋
+            </h1>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-white/65 sm:text-xl">
+              Your premium workspace is ready. Pick a prompt below to begin a focused, polished conversation.
+            </p>
+          </div>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {QUICK_PROMPTS.map((prompt) => (
@@ -82,7 +87,7 @@ export default function ChatIndexPage() {
                 key={prompt}
                 onClick={() => startConversation(prompt)}
                 disabled={creating}
-                className="min-h-[110px] rounded-[1.75rem] border border-white/10 bg-midnight-soft px-5 py-5 text-left text-white/85 transition hover:border-electric/30 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-h-[108px] rounded-[1.5rem] border border-white/10 bg-midnight-soft/80 px-5 py-5 text-left text-white/85 transition hover:border-electric/30 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <p className="text-base font-semibold">{prompt}</p>
               </button>
